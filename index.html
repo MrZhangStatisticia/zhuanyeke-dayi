@@ -161,7 +161,7 @@ function buildTree(sk,container){
   data.forEach(function(ch,chi){
     var im=img(sk,ch.page);
     h+='<div class="tree-node">';
-    h+='<div class="tree-label" onclick="var a=this.nextElementSibling;a.classList.toggle('open');this.querySelector('.arrow').classList.toggle('open')">';
+    h+='<div class="tree-label tree-toggle" data-sk="'+sk+'" data-chi="'+chi+'">';
     h+='<span class="arrow">▶</span><span class="tree-chapter">'+esc(ch.title)+'</span>';
     if(im)h+=' <span class="page-btn" data-img="'+im+'">📄</span>';
     h+='</div>';
@@ -177,7 +177,18 @@ function buildTree(sk,container){
     h+='</div></div>';
   });
   container.innerHTML=h;
-  // Click handlers
+  // Toggle chapter expand/collapse
+  container.querySelectorAll('.tree-toggle').forEach(function(el){
+    el.addEventListener('click',function(e){
+      if(e.target.closest('.page-btn'))return;
+      var children=this.nextElementSibling;
+      if(children){
+        children.classList.toggle('open');
+        this.querySelector('.arrow').classList.toggle('open');
+      }
+    });
+  });
+  // Section click -> go to detail
   container.querySelectorAll('.tree-section').forEach(function(el){
     el.addEventListener('click',function(e){
       if(e.target.closest('.page-btn'))return;
@@ -186,6 +197,7 @@ function buildTree(sk,container){
       setTimeout(function(){scrollTo(el.dataset.sk,parseInt(el.dataset.chi),parseInt(el.dataset.si))},150);
     });
   });
+  // Page image buttons
   container.querySelectorAll('.page-btn').forEach(function(el){
     el.addEventListener('click',function(e){e.stopPropagation();showModal(this.dataset.img)});
   });
